@@ -49,7 +49,9 @@ CREATE TABLE "Tasks" (
     "description" CHAR(255) NOT NULL,
     "status" CHAR(100) NOT NULL,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "updated_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Tasks_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -59,7 +61,9 @@ CREATE TABLE "subtasks" (
     "title" CHAR(100) NOT NULL,
     "is_completed" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "updated_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "subtasks_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -67,24 +71,6 @@ CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserSettings_user_id_key" ON "UserSettings"("user_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Boards_user_id_key" ON "Boards"("user_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Columns_board_id_key" ON "Columns"("board_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Tasks_column_id_key" ON "Tasks"("column_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Tasks_id_key" ON "Tasks"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "subtasks_task_id_key" ON "subtasks"("task_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "subtasks_id_key" ON "subtasks"("id");
 
 -- AddForeignKey
 ALTER TABLE "UserSettings" ADD CONSTRAINT "UserSettings_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

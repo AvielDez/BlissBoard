@@ -11,8 +11,9 @@ datasource db {
 }
 
 model Users {
-  id          String   @id @default(uuid())
+  id          String   @id @unique @default(uuid())
   email       String   @unique @db.Char(100)
+  salt        String   @unique
   password    String   @db.Char(255)
   first_name  String   @db.Char(100)
   last_name   String   @db.Char(100)
@@ -33,8 +34,8 @@ model UserSettings {
 }
 
 model Boards {
-  user_id    String   @unique
-  id         Int      @id @default(autoincrement())
+  user_id    String
+  id         Int      @id @unique @default(autoincrement())
   name       String   @db.Char(225)
   created_at DateTime @default(now()) @db.Timestamptz(3)
   updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(3)
@@ -44,8 +45,8 @@ model Boards {
 }
 
 model Columns {
-  board_id   Int      @unique
-  id         Int      @id @default(autoincrement())
+  board_id   Int
+  id         Int      @id @unique @default(autoincrement())
   name       String   @db.Char(100)
   created_at DateTime @default(now()) @db.Timestamptz(3)
   updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(3)
@@ -55,8 +56,8 @@ model Columns {
 }
 
 model Tasks {
-  column_id   Int      @unique
-  id          Int      @unique @default(autoincrement())
+  column_id   Int
+  id          Int      @id @unique @default(autoincrement())
   title       String   @db.Char(100)
   description String   @db.Char(255)
   status      String   @db.Char(100)
@@ -68,8 +69,8 @@ model Tasks {
 }
 
 model subtasks {
-  task_id      Int      @unique
-  id           Int      @unique @default(autoincrement())
+  task_id      Int
+  id           Int      @id @unique @default(autoincrement())
   title        String   @db.Char(100)
   is_completed Boolean  @default(false)
   created_at   DateTime @default(now()) @db.Timestamptz(3)
