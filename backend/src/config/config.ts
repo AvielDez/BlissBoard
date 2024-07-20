@@ -7,6 +7,7 @@ const env = cleanEnv(process.env, {
   NODE_ENV: str({ choices: ["development", "test", "production"], devDefault: "development" }),
   PORT: num({ devDefault: 3000 }),
   DATABASE_URL: url(),
+  JWT_SECRET: str({ devDefault: "JWT Secret" }),
 });
 
 export default env;
