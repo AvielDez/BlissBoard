@@ -1,6 +1,7 @@
 import express from "express";
 import authRouter from "./routes/authRoutes";
 import morganMiddleware from "./middleware/loggerMiddleware";
+import routes from "./routes";
 
 const app = express();
 
@@ -8,8 +9,8 @@ const app = express();
 app.use(express.json());
 app.use(morganMiddleware);
 
-//Routes
-app.use("/auth", authRouter);
+//Prefix for all routes
+app.use("/api/v1/blissboard", routes);
 
 app.get("/", (req, res) => {
   res.send("Hello, bob!");

@@ -64,6 +64,15 @@ export const login = async (req: Request, res: Response) => {
       }
     );
 
+    await prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        lastLogin: new Date(),
+      },
+    });
+
     res.status(200).json({
       accessToken: token,
       user: {
