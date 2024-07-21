@@ -12,8 +12,4 @@ app.use(morganMiddleware);
 //Prefix for all routes
 app.use("/api/v1/blissboard", routes);
 
-app.get("/", (req, res) => {
-  res.send("Hello, bob!");
-});
-
 export default app;
