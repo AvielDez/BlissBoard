@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@prisma/client": "^3.0.0",
+    "bad-words": "^3.0.4",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "envalid": "^8.0.0",

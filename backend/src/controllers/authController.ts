@@ -3,7 +3,7 @@ import prisma from "../prismaClient";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import env from "../config/config";
-import { generateUniqueUsername } from "../services/generateUniqueUsername";
+import { generateUniqueUsername } from "../services/auth/generateUniqueUsername";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password, name, username } = req.body;
@@ -57,5 +57,34 @@ export const login = async (req: Request, res: Response) => {
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const updateUsername = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { username: newUsername } = req.body;
+
+  const existingUsername = await prisma.user.findUnique({
+    where: {
+      username: newUsername,
+    },
+  });
+
+  if (existingUsername) {
+    return res.status(400).json({ error: "Username already exists" });
+  }
+
+  try {
+    await prisma.user.update({
+      where: {
+        id: Number(userId),
+      },
+      data: {
+        username: newUsername,
+      },
+    });
+    res.status(200).json({ message: "Username updated successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };
