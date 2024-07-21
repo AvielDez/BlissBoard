@@ -23,4 +23,71 @@ model User {
   updatedAt  DateTime  @updatedAt
   profilePic String?
   lastLogin  DateTime?
+  Board      Board[]
+  Column     Column[]
+  Task       Task[]
+  Subtask    Subtask[]
+}
+
+model Board {
+  userId    Int
+  boardId   Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  columns   Column[]
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("boards")
+}
+
+model Column {
+  userId    Int
+  columnId  Int      @id @default(autoincrement())
+  boardId   Int
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [boardId])
+  user      User     @relation(fields: [userId], references: [id])
+  tasks     Task[]
+
+  @@index([userId])
+  @@index([boardId])
+  @@map("columns")
+}
+
+model Task {
+  userId      Int
+  taskId      Int       @id @default(autoincrement())
+  columnId    Int
+  title       String
+  description String
+  status      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  column      Column    @relation(fields: [columnId], references: [columnId])
+  user        User      @relation(fields: [userId], references: [id])
+  subtasks    Subtask[]
+
+  @@index([userId])
+  @@index([columnId])
+  @@map("tasks")
+}
+
+model Subtask {
+  userId      Int
+  subtaskId   Int      @id @default(autoincrement())
+  taskId      Int
+  title       String
+  isCompleted Boolean
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  task        Task     @relation(fields: [taskId], references: [taskId])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([taskId])
+  @@map("subtasks")
 }

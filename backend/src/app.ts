@@ -1,5 +1,4 @@
 import express from "express";
-import authRouter from "./routes/authRoutes";
 import morganMiddleware from "./middleware/loggerMiddleware";
 import routes from "./routes";
 
