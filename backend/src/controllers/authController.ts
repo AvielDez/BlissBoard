@@ -38,6 +38,7 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
+  const jwtSecret = env.JWT_SECRET;
 
   try {
     const user = await prisma.user.findUnique({
@@ -50,11 +51,28 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ userId: user.id }, env.JWT_SECRET, {
-      expiresIn: "1h",
+    const token = jwt.sign(
+      {
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      jwtSecret,
+      {
+        algorithm: "HS256",
+        expiresIn: "1h",
+      }
+    );
+
+    res.status(200).json({
+      accessToken: token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        username: user.username,
+      },
     });
-    console.log(token);
-    res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
