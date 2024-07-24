@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import prisma from "../prismaClient";
 import { UpdateBoardSchema, CreateBoardSchema } from "../types/schemas/board/boardSchemas";
 import { validateRequestSchema } from "../utils/validateRequestSchema";
-import { updateColumnNameById, createBoardByUserId, getBoardByUserIdAndBoardId } from "../services/boards/boardServices";
+import { updateColumnNameById, createBoardByUserId, getBoardByUserIdAndBoardId, deleteColumnById, deleteTasksByColumnId } from "../services/boards/boardServices";
 
 // * Boards
 // * GET    - /users/:userId/boards/- get all boards
@@ -27,7 +27,7 @@ export const getBoard = async (req: Request, res: Response) => {
 
     res.status(200).json({ board });
   } catch (error) {
-    if (error instanceof ErrorEvent) {
+    if (error instanceof Error) {
       res.status(400).json({ error: error.message });
     } else {
       res.status(400).json({ error });
@@ -47,7 +47,7 @@ export const getBoards = async (req: Request, res: Response) => {
 
     res.status(200).json({ boards });
   } catch (error) {
-    if (error instanceof ErrorEvent) {
+    if (error instanceof Error) {
       res.status(400).json({ error: error.message });
     } else {
       res.status(400).json({ error });
@@ -66,23 +66,27 @@ export const updateBoard = async (req: Request, res: Response) => {
 
   try {
     if (name) {
-      const board = await updateColumnNameById(Number(boardId), name);
-      res.status(201).json({ board });
+      await updateColumnNameById(Number(boardId), name);
+    }
+    for (const column of columns) {
+      if (column.toDelete) {
+        await deleteTasksByColumnId(column.id);
+        await deleteColumnById(column.id);
+      } else {
+        await updateColumnNameById(column.id, column.name);
+      }
     }
 
-    for (let column of columns) {
-      await updateColumnNameById(column.id, column.name);
-    }
+    const board = getBoardByUserIdAndBoardId(Number(userId), Number(boardId));
+
+    res.status(201).json({ board });
   } catch (error) {
-    if (error instanceof ErrorEvent) {
+    if (error instanceof Error) {
       res.status(400).json({ error: error.message });
     } else {
       res.status(400).json({ error });
     }
   }
-
-  //loop through columnsToDelete and delete tasks within if any and column
-  //update column names with columns.
 };
 
 export const createBoard = async (req: Request, res: Response) => {

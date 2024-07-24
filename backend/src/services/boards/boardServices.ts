@@ -8,7 +8,11 @@ export const getBoardByUserIdAndBoardId = async (userId: number, boardId: number
         boardId: boardId,
       },
       include: {
-        columns: true,
+        columns: {
+          include: {
+            tasks: true,
+          },
+        },
       },
     });
   } catch (error) {
