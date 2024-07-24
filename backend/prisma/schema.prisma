@@ -36,7 +36,7 @@ model Board {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   columns   Column[]
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("boards")
@@ -49,7 +49,7 @@ model Column {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  board     Board    @relation(fields: [boardId], references: [boardId])
+  board     Board    @relation(fields: [boardId], references: [boardId], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
   tasks     Task[]
 
@@ -67,7 +67,7 @@ model Task {
   status      String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
-  column      Column    @relation(fields: [columnId], references: [columnId])
+  column      Column    @relation(fields: [columnId], references: [columnId], onDelete: Cascade)
   user        User      @relation(fields: [userId], references: [id])
   subtasks    Subtask[]
 
@@ -84,7 +84,7 @@ model Subtask {
   isCompleted Boolean
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
-  task        Task     @relation(fields: [taskId], references: [taskId])
+  task        Task     @relation(fields: [taskId], references: [taskId], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId])

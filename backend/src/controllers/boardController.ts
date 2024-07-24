@@ -1,8 +1,16 @@
 import type { Request, Response } from "express";
 import prisma from "../prismaClient";
-import { UpdateBoardSchema, CreateBoardSchema } from "../types/schemas/board/boardSchemas";
+import { UpdateBoardSchema, CreateBoardSchema } from "../schemas/board/boardSchemas";
 import { validateRequestSchema } from "../utils/validateRequestSchema";
-import { updateColumnNameById, createBoardByUserId, getBoardByUserIdAndBoardId, deleteColumnById, deleteTasksByColumnId } from "../services/boards/boardServices";
+import {
+  updateColumnNameById,
+  createBoardByUserId,
+  getBoardByUserIdAndBoardId,
+  deleteColumnById,
+  deleteTasksByColumnId,
+  updateBoardNameByBoardId,
+  deleteBoardByBoardId,
+} from "../services/boards/boardServices";
 
 // * Boards
 // * GET    - /users/:userId/boards/- get all boards
@@ -66,7 +74,7 @@ export const updateBoard = async (req: Request, res: Response) => {
 
   try {
     if (name) {
-      await updateColumnNameById(Number(boardId), name);
+      await updateBoardNameByBoardId(Number(boardId), name);
     }
     for (const column of columns) {
       if (column.toDelete) {
@@ -77,9 +85,9 @@ export const updateBoard = async (req: Request, res: Response) => {
       }
     }
 
-    const board = getBoardByUserIdAndBoardId(Number(userId), Number(boardId));
+    const board = await getBoardByUserIdAndBoardId(Number(userId), Number(boardId));
 
-    res.status(201).json({ board });
+    res.status(200).json({ board });
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ error: error.message });
@@ -121,6 +129,20 @@ export const createBoard = async (req: Request, res: Response) => {
       res.status(400).json({ error: error.message });
     } else {
       res.status(400).json({ error: error });
+    }
+  }
+};
+
+export const deleteBoard = async (req: Request, res: Response) => {
+  const { boardId } = req.params;
+  try {
+    await deleteBoardByBoardId(Number(boardId));
+    res.status(200);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error });
     }
   }
 };
