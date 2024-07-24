@@ -17,21 +17,13 @@ import {
 // * POST   - /users/:userId/boards - create a new board
 // * GET    - /users/:userId/boards/:boardId - get all data within a board by specified boardId up to tasks.
 // * PUT    - /users/:userId/boards/:boardId - update board info by specified boardId (name, time of update)
-// * DELETE - /users/:userId/boards/:boardId - delete board and all data within it. Cascade Delete
+// * DELETE - /users/boards/:boardId - delete board and all data within it. Cascade Delete
 
 export const getBoard = async (req: Request, res: Response) => {
   const { userId, boardId } = req.params;
 
   try {
-    const board = await prisma.board.findMany({
-      where: {
-        userId: Number(userId),
-        boardId: Number(boardId),
-      },
-      include: {
-        columns: true,
-      },
-    });
+    const board = await getBoardByUserIdAndBoardId(Number(userId), Number(boardId));
 
     res.status(200).json({ board });
   } catch (error) {
@@ -137,7 +129,7 @@ export const deleteBoard = async (req: Request, res: Response) => {
   const { boardId } = req.params;
   try {
     await deleteBoardByBoardId(Number(boardId));
-    res.status(200);
+    res.status(200).json({ message: "Successfully deleted board" });
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ error: error.message });
