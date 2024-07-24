@@ -9,9 +9,9 @@ export const UpdateBoardSchema = z.object({
   name: z.string().optional(),
   columns: z.array(
     z.object({
-      id: z.number(),
+      id: z.number().optional(),
       name: z.string(),
-      toDelete: z.boolean(),
+      toDelete: z.boolean().optional(),
     })
   ),
 });

@@ -142,3 +142,21 @@ export const deleteBoardByBoardId = async (boardId: number) => {
     }
   }
 };
+
+export const createColumnByUserIdAndBoardId = async (userId: number, boardId: number, name: string) => {
+  try {
+    await prisma.column.create({
+      data: {
+        name,
+        boardId,
+        userId,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Unable to delete board ${error.message}`);
+    } else {
+      throw error;
+    }
+  }
+};

@@ -10,6 +10,7 @@ import {
   deleteTasksByColumnId,
   updateBoardNameByBoardId,
   deleteBoardByBoardId,
+  createColumnByUserIdAndBoardId,
 } from "../services/boards/boardServices";
 
 // * Boards
@@ -69,9 +70,11 @@ export const updateBoard = async (req: Request, res: Response) => {
       await updateBoardNameByBoardId(Number(boardId), name);
     }
     for (const column of columns) {
-      if (column.toDelete) {
+      if (column.toDelete && column.id) {
         await deleteTasksByColumnId(column.id);
         await deleteColumnById(column.id);
+      } else if (!column.id) {
+        await createColumnByUserIdAndBoardId(Number(userId), Number(boardId), column.name);
       } else {
         await updateColumnNameById(column.id, column.name);
       }
