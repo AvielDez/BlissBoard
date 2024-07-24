@@ -1,9 +1,12 @@
 import { Router } from "express";
 import authRoutes from "./authRoutes";
+import userRoutes from "./userRoutes";
+import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
+router.use("/users", authenticateToken, userRoutes);
 
 export default router;
 
