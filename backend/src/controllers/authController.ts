@@ -3,7 +3,7 @@ import prisma from "../prismaClient";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import env from "../config/config";
-import { generateUniqueUsername } from "../services/auth/generateUniqueUsername";
+import { generateUniqueUsername } from "../services/authServices";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password, name, username } = req.body;

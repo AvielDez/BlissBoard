@@ -1,24 +1,16 @@
 import type { Request, Response } from "express";
 import prisma from "../prismaClient";
-import { UpdateBoardSchema, CreateBoardSchema } from "../schemas/board/boardSchemas";
+import { UpdateBoardSchema, CreateBoardSchema } from "../schemas/boardSchemas";
 import { validateRequestSchema } from "../utils/validateRequestSchema";
 import {
   updateColumnNameById,
   createBoardByUserId,
   getBoardByUserIdAndBoardId,
   deleteColumnById,
-  deleteTasksByColumnId,
   updateBoardNameByBoardId,
   deleteBoardByBoardId,
   createColumnByUserIdAndBoardId,
-} from "../services/boards/boardServices";
-
-// * Boards
-// * GET    - /users/:userId/boards/- get all boards
-// * POST   - /users/:userId/boards - create a new board
-// * GET    - /users/:userId/boards/:boardId - get all data within a board by specified boardId up to tasks.
-// * PUT    - /users/:userId/boards/:boardId - update board info by specified boardId (name, time of update)
-// * DELETE - /users/boards/:boardId - delete board and all data within it. Cascade Delete
+} from "../services/boardServices";
 
 export const getBoard = async (req: Request, res: Response) => {
   const { userId, boardId } = req.params;
@@ -71,7 +63,6 @@ export const updateBoard = async (req: Request, res: Response) => {
     }
     for (const column of columns) {
       if (column.toDelete && column.id) {
-        await deleteTasksByColumnId(column.id);
         await deleteColumnById(column.id);
       } else if (!column.id) {
         await createColumnByUserIdAndBoardId(Number(userId), Number(boardId), column.name);

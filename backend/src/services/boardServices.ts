@@ -1,4 +1,4 @@
-import prisma from "../../prismaClient";
+import prisma from "../prismaClient";
 
 export const getBoardByUserIdAndBoardId = async (userId: number, boardId: number) => {
   try {
@@ -10,7 +10,11 @@ export const getBoardByUserIdAndBoardId = async (userId: number, boardId: number
       include: {
         columns: {
           include: {
-            tasks: true,
+            tasks: {
+              include: {
+                subtasks: true,
+              },
+            },
           },
         },
       },
@@ -89,22 +93,6 @@ export const deleteColumnById = async (columnId: number) => {
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Unable to delete column: ${error.message}`);
-    } else {
-      throw error;
-    }
-  }
-};
-
-export const deleteTasksByColumnId = async (columnId: number) => {
-  try {
-    await prisma.task.deleteMany({
-      where: {
-        columnId,
-      },
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Unable to delete tasks: ${error.message}`);
     } else {
       throw error;
     }
