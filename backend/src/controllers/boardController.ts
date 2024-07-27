@@ -3,7 +3,7 @@ import prisma from "../prismaClient";
 import { UpdateBoardRequestSchema, CreateBoardRequestSchema } from "../schemas/boardSchemas";
 import { validateRequestSchema } from "../utils/validateRequestSchema";
 import { createBoardService, getBoardService, updateBoardService, deleteBoardService } from "../services/boardServices";
-import { updateColumnNameById, deleteColumnById, createColumn } from "../services/columnServices";
+import { updateColumnNameById, deleteColumnById, createColumn, createManyColumns } from "../services/columnServices";
 
 export const createBoard = async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -17,17 +17,7 @@ export const createBoard = async (req: Request, res: Response) => {
   try {
     const newBoard = await createBoardService({ userId, name });
 
-    const columnsData = columnNames.map((columnName: string) => {
-      return {
-        userId: Number(userId),
-        boardId: newBoard.boardId,
-        name: columnName,
-      };
-    });
-
-    await prisma.column.createMany({
-      data: columnsData,
-    });
+    await createManyColumns({ userId, boardId: String(newBoard.boardId), columnNames });
 
     const board = await getBoardService({ userId, boardId: String(newBoard.boardId) });
 
@@ -95,13 +85,13 @@ export const updateBoard = async (req: Request, res: Response) => {
         await deleteColumnById(column.id);
       } else if (!column.id) {
         await createColumn({
-          userId: Number(userId),
-          boardId: Number(boardId),
+          userId: userId,
+          boardId: boardId,
           name: column.name,
         });
       } else {
         await updateColumnNameById({
-          columnId: column.id,
+          columnId: String(column.id),
           name: column.name,
         });
       }

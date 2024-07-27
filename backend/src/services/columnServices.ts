@@ -1,12 +1,12 @@
 import prisma from "../prismaClient";
-import { CreateColumnType, UpdateColumnNameType } from "../schemas/columnSchemas";
+import { CreateColumnType, CreateManyColumnsType, UpdateColumnNameType } from "../schemas/columnSchemas";
 
 export const updateColumnNameById = async (data: UpdateColumnNameType) => {
   const { name, columnId } = data;
   try {
     return await prisma.column.update({
       where: {
-        columnId,
+        columnId: Number(columnId),
       },
       data: {
         name,
@@ -44,8 +44,8 @@ export const createColumn = async (data: CreateColumnType) => {
     await prisma.column.create({
       data: {
         name,
-        boardId,
-        userId,
+        boardId: Number(boardId),
+        userId: Number(userId),
       },
     });
   } catch (error) {
@@ -57,15 +57,19 @@ export const createColumn = async (data: CreateColumnType) => {
   }
 };
 
-export const createManyColumns = async (data: CreateColumnType) => {
-  const { name, boardId, userId } = data;
+export const createManyColumns = async (data: CreateManyColumnsType) => {
+  const { columnNames, boardId, userId } = data;
   try {
-    await prisma.column.create({
-      data: {
-        name,
-        boardId,
-        userId,
-      },
+    const columnsData = columnNames.map((columnName: string) => {
+      return {
+        userId: Number(userId),
+        boardId: Number(boardId),
+        name: columnName,
+      };
+    });
+
+    await prisma.column.createMany({
+      data: columnsData,
     });
   } catch (error) {
     if (error instanceof Error) {
