@@ -35,4 +35,7 @@ export default router;
  * GET    - /users/:userId/tasks/:taskId - get task with subtasks,
  * PUT    - /users/:userId/tasks/:taskId - update task info by specified taskId (name, time of update, status, subtasks)
  * DELETE - /users/:userId/tasks/:taskId - delete task and all data within it. Cascade Delete
+ *
+ * Subtasks
+ * PUT - /users/:userId/subtasks/:subtasksId - update isCompleted field in subtask
  */

@@ -1,22 +1,51 @@
 import type { Request, Response } from "express";
 import prisma from "../prismaClient";
-import { UpdateBoardSchema, CreateBoardSchema } from "../schemas/boardSchemas";
+import { UpdateBoardRequestSchema, CreateBoardRequestSchema } from "../schemas/boardSchemas";
 import { validateRequestSchema } from "../utils/validateRequestSchema";
-import {
-  updateColumnNameById,
-  createBoardByUserId,
-  getBoardByUserIdAndBoardId,
-  deleteColumnById,
-  updateBoardNameByBoardId,
-  deleteBoardByBoardId,
-  createColumnByUserIdAndBoardId,
-} from "../services/boardServices";
+import { createBoardService, getBoardService, updateBoardService, deleteBoardService } from "../services/boardServices";
+import { updateColumnNameById, deleteColumnById, createColumn } from "../services/columnServices";
+
+export const createBoard = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const validatedData = validateRequestSchema(CreateBoardRequestSchema, req, res);
+
+  if (!validatedData) {
+    return;
+  }
+  const { name, columnNames } = validatedData;
+
+  try {
+    const newBoard = await createBoardService({ userId, name });
+
+    const columnsData = columnNames.map((columnName: string) => {
+      return {
+        userId: Number(userId),
+        boardId: newBoard.boardId,
+        name: columnName,
+      };
+    });
+
+    await prisma.column.createMany({
+      data: columnsData,
+    });
+
+    const board = await getBoardService({ userId, boardId: String(newBoard.boardId) });
+
+    res.status(201).json({ board });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error });
+    }
+  }
+};
 
 export const getBoard = async (req: Request, res: Response) => {
   const { userId, boardId } = req.params;
 
   try {
-    const board = await getBoardByUserIdAndBoardId(Number(userId), Number(boardId));
+    const board = await getBoardService({ userId, boardId });
 
     res.status(200).json({ board });
   } catch (error) {
@@ -50,7 +79,7 @@ export const getBoards = async (req: Request, res: Response) => {
 
 export const updateBoard = async (req: Request, res: Response) => {
   const { userId, boardId } = req.params;
-  const validatedData = validateRequestSchema(UpdateBoardSchema, req, res);
+  const validatedData = validateRequestSchema(UpdateBoardRequestSchema, req, res);
 
   if (!validatedData) {
     return;
@@ -59,19 +88,26 @@ export const updateBoard = async (req: Request, res: Response) => {
 
   try {
     if (name) {
-      await updateBoardNameByBoardId(Number(boardId), name);
+      await updateBoardService({ boardId, name });
     }
     for (const column of columns) {
       if (column.toDelete && column.id) {
         await deleteColumnById(column.id);
       } else if (!column.id) {
-        await createColumnByUserIdAndBoardId(Number(userId), Number(boardId), column.name);
+        await createColumn({
+          userId: Number(userId),
+          boardId: Number(boardId),
+          name: column.name,
+        });
       } else {
-        await updateColumnNameById(column.id, column.name);
+        await updateColumnNameById({
+          columnId: column.id,
+          name: column.name,
+        });
       }
     }
 
-    const board = await getBoardByUserIdAndBoardId(Number(userId), Number(boardId));
+    const board = await getBoardService({ userId, boardId });
 
     res.status(200).json({ board });
   } catch (error) {
@@ -83,46 +119,10 @@ export const updateBoard = async (req: Request, res: Response) => {
   }
 };
 
-export const createBoard = async (req: Request, res: Response) => {
-  const { userId } = req.params;
-  const validatedData = validateRequestSchema(CreateBoardSchema, req, res);
-
-  if (!validatedData) {
-    return;
-  }
-  const { name, columnNames } = validatedData;
-
-  try {
-    const newBoard = await createBoardByUserId(Number(userId), name);
-
-    const columnsData = columnNames.map((columnName: string) => {
-      return {
-        userId: Number(userId),
-        boardId: newBoard.boardId,
-        name: columnName,
-      };
-    });
-
-    await prisma.column.createMany({
-      data: columnsData,
-    });
-
-    const board = await getBoardByUserIdAndBoardId(Number(userId), newBoard.boardId);
-
-    res.status(201).json({ board });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(400).json({ error: error });
-    }
-  }
-};
-
 export const deleteBoard = async (req: Request, res: Response) => {
   const { boardId } = req.params;
   try {
-    await deleteBoardByBoardId(Number(boardId));
+    await deleteBoardService(boardId);
     res.status(200).json({ message: "Successfully deleted board" });
   } catch (error) {
     if (error instanceof Error) {

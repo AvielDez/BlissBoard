@@ -1,11 +1,13 @@
 import prisma from "../prismaClient";
+import { CreateBoardType, GetBoardType, UpdateBoardType } from "../schemas/boardSchemas";
 
-export const getBoardByUserIdAndBoardId = async (userId: number, boardId: number) => {
+export const getBoardService = async (data: GetBoardType) => {
+  const { userId, boardId } = data;
   try {
     return await prisma.board.findFirst({
       where: {
-        userId,
-        boardId,
+        userId: Number(userId),
+        boardId: Number(boardId),
       },
       include: {
         columns: {
@@ -28,7 +30,8 @@ export const getBoardByUserIdAndBoardId = async (userId: number, boardId: number
   }
 };
 
-export const createBoardByUserId = async (userId: number, name: string) => {
+export const createBoardService = async (data: CreateBoardType) => {
+  const { userId, name } = data;
   try {
     return await prisma.board.create({
       data: {
@@ -45,11 +48,13 @@ export const createBoardByUserId = async (userId: number, name: string) => {
   }
 };
 
-export const updateBoardNameByBoardId = async (boardId: number, name: string) => {
+export const updateBoardService = async (data: UpdateBoardType) => {
+  const { boardId, name } = data;
+
   try {
     await prisma.board.update({
       where: {
-        boardId,
+        boardId: Number(boardId),
       },
       data: {
         name,
@@ -64,80 +69,11 @@ export const updateBoardNameByBoardId = async (boardId: number, name: string) =>
   }
 };
 
-export const updateColumnNameById = async (columnId: number, name: string) => {
-  try {
-    return await prisma.column.update({
-      where: {
-        columnId,
-      },
-      data: {
-        name,
-      },
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Unable to update column: ${error.message}`);
-    } else {
-      throw error;
-    }
-  }
-};
-
-export const deleteColumnById = async (columnId: number) => {
-  try {
-    await prisma.column.delete({
-      where: {
-        columnId,
-      },
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Unable to delete column: ${error.message}`);
-    } else {
-      throw error;
-    }
-  }
-};
-
-export const deleteTaskByTaskId = async (taskId: number) => {
-  try {
-    await prisma.task.delete({
-      where: {
-        taskId,
-      },
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Unable to delete task: ${error.message}`);
-    } else {
-      throw error;
-    }
-  }
-};
-
-export const deleteBoardByBoardId = async (boardId: number) => {
+export const deleteBoardService = async (boardId: string) => {
   try {
     await prisma.board.delete({
       where: {
-        boardId,
-      },
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Unable to delete board ${error.message}`);
-    } else {
-      throw error;
-    }
-  }
-};
-
-export const createColumnByUserIdAndBoardId = async (userId: number, boardId: number, name: string) => {
-  try {
-    await prisma.column.create({
-      data: {
-        name,
-        boardId,
-        userId,
+        boardId: Number(boardId),
       },
     });
   } catch (error) {

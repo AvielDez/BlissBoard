@@ -2,16 +2,7 @@ import type { Request, Response } from "express";
 import prisma from "../prismaClient";
 import { UpdateBoardSchema, CreateBoardSchema } from "../schemas/boardSchemas";
 import { validateRequestSchema } from "../utils/validateRequestSchema";
-import {
-  updateColumnNameById,
-  createBoardByUserId,
-  getBoardByUserIdAndBoardId,
-  deleteColumnById,
-  deleteTasksByColumnId,
-  updateBoardNameByBoardId,
-  deleteBoardByBoardId,
-  createColumnByUserIdAndBoardId,
-} from "../services/boardServices";
+import { CreateTaskSchema } from "../schemas/taskSchemas";
 /*
  * Tasks - Tasks endpoints for managing subtasks as the subtask edits are only accessible through the task forms
  * POST   - /users/:userId/tasks - create a new task (name, status, subtasks)
@@ -20,18 +11,24 @@ import {
  * DELETE - /users/:userId/tasks/:taskId - delete task and all data within it. Cascade Delete
  */
 
-export const createTask = async (req: Request, res: Response) => {
-  const { userId, boardId } = req.params;
+// export const createTask = async (req: Request, res: Response) => {
+//   const { userId } = req.params;
 
-  try {
-    const board = await getBoardByUserIdAndBoardId(Number(userId), Number(boardId));
+//   const validatedData = validateRequestSchema(CreateTaskSchema, req, res);
 
-    res.status(200).json({ board });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(400).json({ error });
-    }
-  }
-};
+//   if (!validatedData) {
+//     return;
+//   }
+//   const { title, description, subtasks,  } = validatedData;
+//   try {
+//     const task = await createTask(validatedData);
+
+//     res.status(200).json({ board });
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       res.status(400).json({ error: error.message });
+//     } else {
+//       res.status(400).json({ error });
+//     }
+//   }
+// };
