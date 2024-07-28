@@ -58,6 +58,7 @@ export const updateBoardService = async (data: UpdateBoardType) => {
       },
       data: {
         name,
+        updatedAt: new Date(),
       },
     });
   } catch (error) {

@@ -79,5 +79,3 @@ export const createManyColumns = async (data: CreateManyColumnsType) => {
     }
   }
 };
-
-///TODO: Need to finish creating the createManyColumns function and schemas before moving on the task controller and services

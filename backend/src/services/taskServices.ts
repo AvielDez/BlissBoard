@@ -1,11 +1,11 @@
 import prisma from "../prismaClient";
-import { CreateTaskType } from "../schemas/taskSchemas";
+import { CreateTaskType, UpdateTaskType } from "../schemas/taskSchemas";
 
-export const deleteTaskByTaskId = async (taskId: number) => {
+export const deleteTaskService = async (taskId: string) => {
   try {
     await prisma.task.delete({
       where: {
-        taskId,
+        taskId: Number(taskId),
       },
     });
   } catch (error) {
@@ -17,39 +17,47 @@ export const deleteTaskByTaskId = async (taskId: number) => {
   }
 };
 
-export const updateTaskByTaskId = async (taskId: number) => {
+export const updateTaskService = async (data: UpdateTaskType) => {
+  const { columnId, taskId, title, description, status } = data;
+  const taskIdNumber = Number(taskId);
   try {
     await prisma.task.update({
       where: {
-        taskId,
+        taskId: taskIdNumber,
       },
       data: {
-        //Data to update
+        columnId,
+        title,
+        description,
+        status,
+        updatedAt: new Date(),
       },
     });
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Unable to delete task: ${error.message}`);
+      throw new Error(`Unable to update task: ${error.message}`);
     } else {
       throw error;
     }
   }
 };
-export const createTask = async (data: CreateTaskType) => {
+
+export const createTaskService = async (data: CreateTaskType) => {
   const { columnId, userId, title, description, status } = data;
   try {
     const newTask = await prisma.task.create({
       data: {
-        userId,
+        userId: Number(userId),
         columnId,
         description,
         title,
         status,
       },
     });
+    return newTask;
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Unable to delete task: ${error.message}`);
+      throw new Error(`Unable to create task: ${error.message}`);
     } else {
       throw error;
     }
