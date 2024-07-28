@@ -4,13 +4,6 @@ import { CreateTaskRequestSchema, UpdateTaskRequestSchema } from "../schemas/tas
 import { createTaskService, deleteTaskService, updateTaskService } from "../services/taskServices";
 import { createSubtaskService, deleteSubtaskService, updateSubtaskService } from "../services/subtaskServices";
 import prisma from "../prismaClient";
-import { CreateSubtaskType } from "../schemas/subtaskSchemas";
-/*
- * Tasks - Tasks endpoints for managing subtasks as the subtask edits are only accessible through the task forms
- * POST   - /users/:userId/tasks - create a new task (name, status, subtasks)
- * PUT    - /users/:userId/tasks/:taskId - update task info by specified taskId (name, time of update, status, subtasks)
- * DELETE - /users/tasks/:taskId - delete task and all data within it. Cascade Delete
- */
 
 export const createTask = async (req: Request, res: Response) => {
   const { userId } = req.params;
